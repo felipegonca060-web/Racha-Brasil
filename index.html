@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Racha Brasil</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#10141d;color:white;font-family:Arial;text-align:center}
+header{padding:18px;background:#202838;color:#ff9d24}
+h1{margin:0}
+main{padding:12px}
+canvas{width:100%;max-width:600px;background:#64788a;border-radius:12px}
+button{padding:13px;margin:5px;border:0;border-radius:9px;background:#29364b;color:white;font-size:16px;font-weight:bold}
+.gold{color:#50f59a}
+</style>
+</head>
+<body>
+<header>
+<h1>🇧🇷 RACHA BRASIL</h1>
+<p>Garagem e corridas</p>
+<div class="gold">💰 R$ <span id="cash">5000</span></div>
+</header>
+
+<main>
+<canvas id="game" width="600" height="300"></canvas>
+
+<h2>🚗 Minha garagem</h2>
+<p id="msg">Personalize seu Gol!</p>
+
+<h3>Pintura — R$ 500</h3>
+<button onclick="paint('#e63946')">🔴 Vermelho</button>
+<button onclick="paint('#eeeeee')">⚪ Branco</button>
+<button onclick="paint('#168cff')">🔵 Azul</button>
+<button onclick="paint('#171717')">⚫ Preto</button>
+
+<h3>Rodas — R$ 800</h3>
+<button onclick="wheels()">🛞 Rodas esportivas</button>
+
+<h3>🏁 Corrida de teste</h3>
+<button onclick="race()">Iniciar corrida</button>
+<button onclick="steer(-1)">⬅️</button>
+<button onclick="steer(1)">➡️</button>
+</main>
+
+<script>
+const c=document.getElementById("game");
+const ctx=c.getContext("2d");
+let money=5000,color="#e63946",sport=false;
+let carX=300,running=false,road=0;
+
+function message(t){
+ document.getElementById("msg").textContent=t;
+}
+function updateCash(){
+ document.getElementById("cash").textContent=money;
+}
+function paint(col){
+ if(color===col)return message("Essa cor já está instalada!");
+ if(money<500)return message("Dinheiro insuficiente!");
+ money-=500;color=col;updateCash();draw();
+ message("Pintura instalada!");
+}
+function wheels(){
+ if(sport)return message("Você já tem rodas esportivas!");
+ if(money<800)return message("Dinheiro insuficiente!");
+ money-=800;sport=true;updateCash();draw();
+ message("Rodas esportivas instaladas!");
+}
+function steer(dir){
+ carX=Math.max(145,Math.min(455,carX+dir*25));
+ draw();
+}
+function race(){
+ running=true;
+ message("Corrida iniciada! Use as setas para desviar.");
+ animate();
+}
+function draw(){
+ ctx.clearRect(0,0,600,300);
+
+ // Céu e cenário
+ ctx.fillStyle="#829daf";
+ ctx.fillRect(0,0,600,300);
+ ctx.fillStyle="#52616e";
+ for(let i=0;i<10;i++){
+  ctx.fillRect(i*65,90,45,75);
+ }
+
+ // Pista em perspectiva
+ ctx.fillStyle="#292d34";
+ ctx.beginPath();
+ ctx.moveTo(230,90);ctx.lineTo(370,90);
+ ctx.lineTo(600,300);ctx.lineTo(0,300);
+ ctx.closePath();ctx.fill();
+
+ // Linhas da pista
+ ctx.strokeStyle="white";ctx.lineWidth=5;
+ ctx.beginPath();
+ ctx.moveTo(300,90);ctx.lineTo(300,300);ctx.stroke();
+
+ // Marcas animadas
+ for(let i=0;i<6;i++){
+  let y=100+((i*50+road)%200);
+  let x=300;
+  ctx.fillStyle="#fff";
+  ctx.fillRect(x-4,y,8,18);
+ }
+
+ // Carro
+ ctx.save();
+ ctx.translate(carX,235);
+
+ ctx.fillStyle="#111";
+ ctx.fillRect(-65,0,25,45);
+ ctx.fillRect(40,0,25,45);
+
+ ctx.fillStyle=color;
+ ctx.beginPath();
+ ctx.moveTo(-75,10);ctx.lineTo(-55,-40);
+ ctx.lineTo(-35,-58);ctx.lineTo(35,-58);
+ ctx.lineTo(55,-40);ctx.lineTo(75,10);
+ ctx.closePath();ctx.fill();
+
+ ctx.fillStyle="#182c3b";
+ ctx.fillRect(-36,-47,72,25);
+
+ ctx.fillStyle=sport?"#ddd":"#777";
+ ctx.beginPath();ctx.arc(-50,12,13,0,7);ctx.fill();
+ ctx.beginPath();ctx.arc(50,12,13,0,7);ctx.fill();
+
+ ctx.fillStyle="#fff";
+ ctx.fillRect(-55,0,18,7);ctx.fillRect(37,0,18,7);
+ ctx.restore();
+}
+function animate(){
+ if(!running)return;
+ road=(road+5)%200;
+ draw();
+ requestAnimationFrame(animate);
+}
+draw();
+</script>
+</body>
+</html>
+
