@@ -46,15 +46,25 @@ button{padding:13px;margin:5px;border:0;border-radius:9px;background:#29364b;col
 <script>
 const c=document.getElementById("game");
 const ctx=c.getContext("2d");
-let money=5000,color="#e63946",sport=false;
+
+let money = Number(localStorage.getItem("racha_money")) || 5000;
+let color = localStorage.getItem("racha_color") || "#e63946";
+let sport = localStorage.getItem("racha_sport") === "true";
+
 let carX=300,running=false,road=0;
 
 function message(t){
  document.getElementById("msg").textContent=t;
 }
+
 function updateCash(){
  document.getElementById("cash").textContent=money;
+
+ localStorage.setItem("racha_money", money);
+ localStorage.setItem("racha_color", color);
+ localStorage.setItem("racha_sport", sport);
 }
+ 
 function paint(col){
  if(color===col)return message("Essa cor já está instalada!");
  if(money<500)return message("Dinheiro insuficiente!");
@@ -139,6 +149,8 @@ function animate(){
  draw();
  requestAnimationFrame(animate);
 }
+
+updateCash();
 draw();
 </script>
 </body>
